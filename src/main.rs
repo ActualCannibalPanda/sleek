@@ -1,5 +1,4 @@
 use bevy::asset::AssetMetaCheck;
-use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::*;
 
 fn main() {
@@ -29,23 +28,18 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn update(
     time: Res<Time>,
-    mut input: EventReader<KeyboardInput>,
+    input: Res<ButtonInput<KeyCode>>,
     mut query: Query<(&Sprite, &mut Transform)>,
 ) {
-    let (_, mut transform) = query.single_mut().unwrap();
-    let mut velocity: Vec3 = Vec3::ZERO;
-    for event in input.read() {
-        match event.key_code {
-            KeyCode::KeyA => {
-                velocity.x -= 100.0;
-            }
-            KeyCode::KeyD => {
-                velocity.x += 100.0;
-            }
-            _ => {}
+    for (_, mut transform) in query.iter_mut() {
+        let mut velocity: Vec3 = Vec3::ZERO;
+        if input.pressed(KeyCode::KeyA) {
+            velocity.x -= 1.0;
         }
-    }
-    if velocity != Vec3::ZERO {
-        transform.translation += velocity * time.delta().as_secs_f32();
+        if input.pressed(KeyCode::KeyD) {
+            velocity.x += 1.0;
+        }
+        transform.translation.x += velocity.x * 210.0 * time.delta_secs();
+        transform.translation.y += velocity.y * 210.0 * time.delta_secs();
     }
 }
